@@ -73,7 +73,7 @@ def sum_part_numbers() -> int:
 def append_surrounding(matrix: list[list[list[T]]], value: T, row: int, start_col: int, end_col: int) -> None:
     """
     Given a matrix whose cells are lists, append the given value to all the cells surrounding
-    a 1xN block of positions.  Assumes that start_col >= 1 and end_col <= len(matrix[row])
+    a 1xN block of positions.  Assumes that start_col > 0 and end_col < len(matrix[row])
     :param matrix: the rectangular matrix, indexed first by row, then by column
     :param value: the value to append
     :param row: the row in the matrix (first index into matrix)
