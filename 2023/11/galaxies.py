@@ -29,6 +29,8 @@ def shortest_paths(empty_multiplier):
 
     total_distance = 0
     for i, g_a in enumerate(galaxies):
+        # "pairs" ignore ordering, so we only need to consider the top triangle of the full
+        # cartesian product
         for g_b in galaxies[i+1:]:
             # distance between is just Manhattan metric, extended by the empty rows & cols
             row1, row2 = sorted((g_a.row, g_b.row))
