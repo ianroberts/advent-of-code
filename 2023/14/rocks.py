@@ -94,6 +94,9 @@ def spin(matrix):
     tilt(matrix, elt_from_south, rows, cols)
     tilt(matrix, elt_from_east, cols, rows)
 
+    # After the spin is complete, calculate a "signature" for the current state
+    # of the matrix, consisting of a list of lists, one for each row, containing
+    # the number of Os stacked up against each # in that row.
     rocks = 0
     signature = []
     for row in matrix:
@@ -106,6 +109,8 @@ def spin(matrix):
                 row_sig.append(rocks)
                 rocks = 0
 
+    # freeze the list of lists as a tuple of tuples, so it can be used
+    # as a dict key
     return tuple(tuple(row) for row in signature)
 
 
@@ -113,8 +118,6 @@ def total_load_after(spins):
     matrix = parse_input()
     spin_sigs = {}
     i = 0
-    cycle_start = None
-    cycle_length = 0
     while True:
         i += 1
         sig = spin(matrix)
