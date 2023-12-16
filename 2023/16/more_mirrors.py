@@ -118,9 +118,10 @@ def max_energized(*start_pos):
         start_pos.extend((Cell(0, c), D) for c in range(COLS))
         start_pos.extend((Cell(ROWS-1, c), U) for c in range(COLS))
 
-    return max(energized_tiles(graph, pos) for pos in start_pos)
+    return max(((pos, energized_tiles(graph, pos)) for pos in start_pos), key=lambda i: i[1])
 
 
 if __name__ == "__main__":
-    print(f"Count of energized tiles from (0, 0) -> R: {max_energized((Cell(0, 0), R))}")
-    print(f"Maximum energized tiles for any start position: {max_energized()}")
+    print(f"Count of energized tiles from (0, 0) -> R: {max_energized((Cell(0, 0), R))[1]}")
+    max_pos, max_val = max_energized()
+    print(f"Maximum energized tiles overall is {max_val} starting from {max_pos}")
