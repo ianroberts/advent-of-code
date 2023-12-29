@@ -120,6 +120,75 @@ def intersecting_traces(coord_min, coord_max):
     return crossing
 
 
+# For part 2, we "ride the rock" - use a frame of reference in which the rock does not move
+# by subtracting the (unknown) velocity vector of the rock from the (known) velocity vector
+# of each hailstone.  For the correct rock velocity vector this will cause all pairs of
+# hailstone trajectories in the rock-centred frame of reference to intersect at the same
+# point (but not at the same time), namely the x, y, z location from which the rock was
+# thrown at t=0.  We know from the wording of the question that such a solution definitely
+# exists for the given input.
+#
+# Initially ignoring the z axis, we consider pairs of hailstones i and j and construct
+# a system of equations for x and the rock velocity components - since we're looking for
+# a point (x, y) where all the trajectories intersect we have
+#
+# y = yi0 + (x-xi0)(dyi-dyr)/(dxi-dxr)
+# y = yj0 + (x-xj0)(dyj-dyr)/(dxj-dxr)
+#
+# subtracting one equation from the other:
+#
+# yi0 + (x-xi0)(dyi-dyr)/(dxi-dxr) - yj0 - (x-xj0)(dyj-dyr)/(dxj-dxr) = 0
+#
+# Doing this for several pairs of known x0, y0, dx, dy we get a system of equations that
+# can be solved for x, dxr and dyr, then substitute into the original equation to find y.
+#
+# Once we have x, y, dx and dy we can use a similar approach to determine z and dz - this
+# time slicing in the x/z plane - take any pair i/j of hailstones and solve for
+#
+# z = zi0 + (x-xi0)(dzi-dzr)/(dxi-dxr)
+# z = zj0 + (x-xj0)(dzj-dzr)/(dxj-dxr)
+#
+# Subtract and solve for dzr (the only unknown)
+#
+# zi0 + (x-xi0)(dzi-dzr)/(dxi-dxr) - zj0 - (x-xj0)(dzj-dzr)/(dxj-dxr) = 0
+#
+# and substitute back in to find z
+
+
+from sympy import solve, symbols
+
+def rock():
+    particles = parse_input()
+    x, y, dx, dy = symbols("x y dx dy")
+    equations = []
+    for p1, p2 in ((particles[2*i], particles[2*i+1]) for i in range(6)):
+        equations.append((p1.y0 - p2.y0) + (x-p1.x0) * (p1.dy-dy)/(p1.dx-dx) - (x-p2.x0) * (p2.dy-dy)/(p2.dx-dx))
+
+    print(f"Solving {equations}")
+    solutions = solve(equations, [x, dx, dy], dict=True)
+    if not(solutions):
+        raise ValueError("No solution found for x, dx and dy")
+
+    p0 = particles[0]
+    p1 = particles[1]
+
+    xr = solutions[0][x]
+    dxr = solutions[0][dx]
+    dyr = solutions[0][dy]
+    yr = p0.y0 + (xr-p0.x0) * (p0.dy-dyr) / (p0.dx-dxr)
+
+    # Now for z
+    dz = symbols("dz")
+    equation = p0.z0 + (xr-p0.x0) * (p0.dz-dz)/(p0.dx-dxr) - p1.z0 - (xr-p1.x0) * (p1.dz-dz)/(p1.dx-dxr)
+    solutions = solve(equation, dz, dict=True)
+    dzr = solutions[0][dz]
+    zr = p0.z0 + (xr-p0.x0) * (p0.dz-dzr) / (p0.dx-dxr)
+    return Particle(xr, yr, zr, dxr, dyr, dzr)
+
+
 if __name__ == "__main__":
     print(f"{intersecting_traces(200000000000000, 400000000000000)} intersecting traces")
     # print(f"{intersecting_traces(7, 27)} intersecting traces")
+    rock_particle = rock()
+    print(f"Rock is {rock_particle}")
+    print(f"part 2 answer = {rock_particle.x0 + rock_particle.y0 + rock_particle.z0}")
