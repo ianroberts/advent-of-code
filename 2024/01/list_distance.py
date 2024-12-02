@@ -2,6 +2,9 @@ from collections import Counter
 
 
 def load_lists():
+    # There's probably a more pythonic way to do this with zip etc. but
+    # given that I need everything as lists I can sort rather than immutable
+    # tuples I'll go with this
     with open("input", "r") as f:
         list1 = []
         list2 = []
@@ -22,9 +25,13 @@ def min_distance():
 
 def similarity():
     list1, list2 = load_lists()
+    # Counter gives you a mapping from value to number-of-occurrences
     count1 = Counter(list1)
     count2 = Counter(list2)
 
+    # The similarity score for each _distinct_ entry N in list 1 is N times the
+    # count of Ns in list 2, then we need to multiply by the number of times that
+    # number was seen in list 1.
     print(f"Similarity: {sum(n1 * cnt1 * count2[n1] for n1, cnt1 in count1.items())}")
 
 
