@@ -21,14 +21,12 @@ def enabled_only():
         # we can find the three cases by structural pattern matching on the
         # groups tuple
         match m.groups():
-            case (None, None, _, None):
-                # only the third group matched -> do()
+            case (None, None, "do", None):
                 enabled = True
-            case (None, None, _, _):
-                # third and fourth -> don't()
+            case (None, None, "do", "n't"):
                 enabled = False
             case (x, y, None, None):
-                # first and second -> mul()
+                # only the first and second groups matched -> mul()
                 if enabled:
                     total += int(x) * int(y)
 
