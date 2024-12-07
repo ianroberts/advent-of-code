@@ -1,4 +1,6 @@
+import math
 import operator
+import time
 from collections import namedtuple
 from typing import Callable
 
@@ -57,8 +59,16 @@ def cat_digits(a: int, b: int) -> int:
     return int(f"{a}{b}")
 
 
+# I've realised what the bug was with my original log-based impl, but this
+# way is actually slower than the string-and-back-again version
+def cat_digits_with_log(a: int, b: int) -> int:
+    return a * (10 ** (math.floor(math.log10(b)) + 1)) + b
+
+
 if __name__ == "__main__":
     print("Part 1")
     solvable(operator.add, operator.mul)
     print("Part 2")
+    start = time.perf_counter()
     solvable(operator.add, operator.mul, cat_digits)
+    print(f"{time.perf_counter() - start} seconds")
