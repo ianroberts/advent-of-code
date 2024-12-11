@@ -3,33 +3,7 @@ from collections import namedtuple, defaultdict
 from itertools import combinations
 
 import numpy as np
-
-
-class Cell(namedtuple("Cell", ["row", "col"])):
-    """
-    This is probably overkill for AoC but I used it as an excuse to play with
-    operator overloading in Python
-    """
-    def __add__(self, other: "Cell") -> "Cell":
-        """
-        Override cell1 + cell2 to do pointwise sum rather than the usual tuple concatenation
-        """
-        return Cell(self.row + other.row, self.col + other.col)
-
-    def __sub__(self, other: "Cell") -> "Cell":
-        """
-        Pointwise subtraction
-        """
-        return Cell(self.row - other.row, self.col - other.col)
-
-    def __floordiv__(self, other: int) -> "Cell":
-        """
-        Divide each coordinate by the given number
-        """
-        return Cell(self.row // other, self.col // other)
-
-    def __neg__(self) -> "Cell":
-        return Cell(-self.row, -self.col)
+from aoc_common.grid import Cell
 
 
 # There are a maximum of 62 distinct antenna types (26 lowercase, 26 uppercase,
