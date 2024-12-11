@@ -147,7 +147,7 @@ def move_files():
 
     head = orig_head
     files: list[Chunk] = []
-    gaps = SortedKeyList(key=gap_key)  # this is wrong
+    gaps = SortedKeyList(key=gap_key)
     while head:
         if head.fileid >= 0:
             files.append(head)
