@@ -37,11 +37,11 @@ class Cell(namedtuple("Cell", ["row", "col"])):
     def set(self, grid: Sequence[MutableSequence[T]], val: T) -> None:
         grid[self.row][self.col] = val
 
-    def neighbours(self, valid_rows, valid_cols, include_diagonal=False) -> list["Cell"]:
+    def neighbours(self, valid_rows=None, valid_cols=None, include_diagonal=False) -> list["Cell"]:
         result = []
         for d in (Direction.DIAGONAL if include_diagonal else Direction.STRAIGHT):
             nbr = self + d
-            if nbr.row in valid_rows and nbr.col in valid_cols:
+            if (valid_rows is None or nbr.row in valid_rows) and (valid_cols is None or nbr.col in valid_cols):
                 result.append(nbr)
 
         return result
