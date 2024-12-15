@@ -28,6 +28,18 @@ class Cell(namedtuple("Cell", ["row", "col"])):
         """
         return Cell(self.row // other, self.col // other)
 
+    def __mul__(self, other: int) -> "Cell":
+        """
+        Multiply each coordinate by the given number
+        """
+        return Cell(self.row * other, self.col * other)
+
+    def __rmul__(self, other: int) -> "Cell":
+        """
+        Multiply each coordinate by the given number
+        """
+        return Cell(self.row * other, self.col * other)
+
     def __neg__(self) -> "Cell":
         return Cell(-self.row, -self.col)
 
