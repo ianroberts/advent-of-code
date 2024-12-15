@@ -36,9 +36,9 @@ def try_move(grid: list[list[str]], direction: Cell, start: Cell) -> bool:
 
     :param grid: the grid, which will be mutated if the move pushes any boxes
     :param direction: Cell representing a vector for the move direction
-    :param start: start position of the move, in the coordinate system of the move direction
+    :param start: start position of the move
     :return: True if the robot was able to move from this position, False if it was blocked
-    (either directly by a wall, or by a stack of boxes).
+    (either directly by a wall, or by a stack of boxes up against a wall).
     """
     boxes_to_move = 0
     while True:
@@ -70,7 +70,12 @@ def predict_position():
 
     print("\n".join("".join(c for c in line) for line in grid))
 
-    print(f"Sum of box coords: {sum((100 * r + c) if grid[r][c] == 'O' else 0 for r in range(len(grid)) for c in range(len(grid[0])))}")
+    total = sum(
+        (100 * r + c) if grid[r][c] == "O" else 0
+        for r in range(len(grid))
+        for c in range(len(grid[0]))
+    )
+    print(f"Sum of box coords: {total}")
 
 
 if __name__ == "__main__":

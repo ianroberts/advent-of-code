@@ -2,13 +2,21 @@ import operator
 
 from aoc_common.grid import Cell, Direction
 
+GET_ROW = operator.attrgetter("row")
+
 
 def load_data():
     with open("input", "r") as f:
         grid = []
         start_pos = None
         for row, line in enumerate(f):
-            line = line.strip().replace("#", "##").replace(".", "..").replace("O", "[]").replace("@", "@.")
+            line = (
+                line.strip()
+                .replace("#", "##")
+                .replace(".", "..")
+                .replace("O", "[]")
+                .replace("@", "@.")
+            )
             if line == "":
                 break
             if (col := line.find("@")) >= 0:
@@ -32,7 +40,7 @@ def try_move_horizontal(grid: list[list[str]], direction: Cell, start: Cell) -> 
     :param direction: Cell representing a vector for the move direction
     :param start: start position of the move
     :return: True if the robot was able to move from this position, False if it was blocked
-    (either directly by a wall, or by a stack of boxes).
+    (either directly by a wall, or by a stack of boxes up against a wall).
     """
     cells_to_move = 0
     while True:
@@ -56,9 +64,6 @@ def try_move_horizontal(grid: list[list[str]], direction: Cell, start: Cell) -> 
     return True
 
 
-getrow = operator.attrgetter("row")
-
-
 def try_move_vertical(grid: list[list[str]], direction: Cell, start: Cell) -> bool:
     """
     Try and move one step in a N/S direction in the grid, pushing any boxes that can
@@ -68,10 +73,11 @@ def try_move_vertical(grid: list[list[str]], direction: Cell, start: Cell) -> bo
     :param direction: Cell representing a vector for the move direction
     :param start: start position of the move
     :return: True if the robot was able to move from this position, False if it was blocked
-    (either directly by a wall, or by a stack of boxes).
+    (either directly by a wall, or by a tree of box stacks that hits a wall).
     """
     # this time we need to keep track of the actual cells being moved, not just how many of them
     cells_to_move = {start}
+    # cells to be moved in the row we most recently inspected
     prev_row_cells_to_move = {start}
     while len(prev_row_cells_to_move) > 0:
         # Each time round this loop we take the positions of the boxes that would be moved
@@ -95,7 +101,7 @@ def try_move_vertical(grid: list[list[str]], direction: Cell, start: Cell) -> bo
                 this_row.add(next_cell)
                 # and the other half of the box!
                 this_row.add(next_cell + Direction.WEST)
-            # else it's a gap
+            # else it's a gap - nothing to do
 
         # advance by one row
         cells_to_move.update(this_row)
@@ -104,41 +110,40 @@ def try_move_vertical(grid: list[list[str]], direction: Cell, start: Cell) -> bo
     # If we get here, we found enough space to move things, so now move them.
     # Sort the set of cells so that we start with the ones furthest from the
     # start point and work inwards towards the start point
-    sorted_cells = sorted(cells_to_move, key=getrow, reverse=direction.row > 0)
+    sorted_cells = sorted(cells_to_move, key=GET_ROW, reverse=direction.row > 0)
     for c in sorted_cells:
         (c + direction).set(grid, c.of(grid))
-        if (c - direction) not in cells_to_move:
-            # There is nothing directly behind c in the set to move, so moving
-            # it will leave a space
-            c.set(grid, ".")
+        # Leave a space behind - this may or may not get filled in when we
+        # start processing the next row back, depending what caused this cell
+        # to move in the first place.
+        c.set(grid, ".")
 
     return True
 
 
-MOVE_DIRECTIONS = {
-    ">": Direction.EAST,
-    "v": Direction.SOUTH,
-    "<": Direction.WEST,
-    "^": Direction.NORTH,
-}
-MOVE_FUNCTIONS = {
-    ">": try_move_horizontal,
-    "v": try_move_vertical,
-    "<": try_move_horizontal,
-    "^": try_move_vertical,
+MOVE = {
+    ">": (Direction.EAST, try_move_horizontal),
+    "v": (Direction.SOUTH, try_move_vertical),
+    "<": (Direction.WEST, try_move_horizontal),
+    "^": (Direction.NORTH, try_move_vertical),
 }
 
 
 def predict_position():
     grid, robot_pos, moves = load_data()
     for m in moves:
-        d = MOVE_DIRECTIONS[m]
-        if MOVE_FUNCTIONS[m](grid, d, robot_pos):
+        d, try_move = MOVE[m]
+        if try_move(grid, d, robot_pos):
             robot_pos += d
 
     print("\n".join("".join(c for c in line) for line in grid))
 
-    print(f"Sum of box coords: {sum((100 * r + c) if grid[r][c] == '[' else 0 for r in range(len(grid)) for c in range(len(grid[0])))}")
+    total = sum(
+        (100 * r + c) if grid[r][c] == "[" else 0
+        for r in range(len(grid))
+        for c in range(len(grid[0]))
+    )
+    print(f"Sum of box coords: {total}")
 
 
 if __name__ == "__main__":
