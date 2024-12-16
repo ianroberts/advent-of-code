@@ -1,4 +1,4 @@
-from heapdict import heapdict
+from aoc_common.heapdict import heapdict
 from collections import namedtuple
 
 
