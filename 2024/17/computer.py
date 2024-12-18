@@ -16,6 +16,20 @@ class BitPattern(namedtuple("BitPattern", ["mask", "pattern"])):
     def __lshift__(self, other: int):
         return BitPattern(self.mask << other, self.pattern << other)
 
+    def __repr__(self):
+        """
+        Shows the masked pattern with 0 or 1 for the constrained bits and
+        "." for the unconstrained ones.
+        """
+        mask_bin = "{:010b}".format(self.mask)
+        # if the mask is more than 10 bits, zero-pad the pattern to the same length
+        pat_bin = ("{:0" + str(len(mask_bin)) + "b}").format(self.pattern)
+        return (
+            "BitPattern("
+            + "".join("." if m == "0" else p for m, p in zip(mask_bin, pat_bin))
+            + ")"
+        )
+
 
 @dataclass
 class Machine:
@@ -135,7 +149,7 @@ def generate_base_patterns(machine: Machine) -> list[set[BitPattern]]:
             b_pattern = BitPattern(7, b ^ k1 ^ k2)
             # constraint on some set of three other bits somewhere between
             # positions 0 and 10
-            c_pattern = BitPattern(7 << (b ^ k2), (n ^ b) << (b ^ k2))
+            c_pattern = BitPattern(7, n ^ b) << (b ^ k2)
             merged = b_pattern.merge(c_pattern)
             if merged:
                 n_patterns.add(merged)
@@ -147,6 +161,12 @@ def generate_base_patterns(machine: Machine) -> list[set[BitPattern]]:
 # See README for explanation
 def quine(machine: Machine):
     base_patterns = generate_base_patterns(machine)
+    # Debug base patterns
+    print("Base patterns:")
+    for n, pats in enumerate(base_patterns):
+        print(n)
+        print(*pats, sep="\n")
+
     candidates = set(base_patterns[machine.program[0]])
     for i in range(1, len(machine.program)):
         target_value = machine.program[i]
@@ -161,6 +181,9 @@ def quine(machine: Machine):
                 merged = tail_pattern.merge(pattern)
                 if merged:
                     new_candidates.add(merged)
+
+        if not new_candidates:
+            raise ValueError("This program cannot generate itself")
 
         candidates = new_candidates
         print(f"{len(candidates)} candidates remain after iteration {i}")
@@ -188,7 +211,7 @@ def load_data():
     )
 
 
-if __name__ == "__main__":
+def main():
     m = load_data()
     # part 1
     m.run(debug=True)
@@ -196,3 +219,7 @@ if __name__ == "__main__":
 
     # part 2
     print(f"Minimum quine seed: {quine(m)}")
+
+
+if __name__ == "__main__":
+    main()
