@@ -2,7 +2,7 @@
 
 Part 1 is the python code in `circuit.py`.
 
-For part 2, I converted the input into CSV format - the connections become this (with the OP name converted to lower case):
+For part 2, I converted the input into CSV format - the connections become this (with the OP name converted to lower case, but I guess that wasn't really necessary in the end):
 
 `a OP b -> c` → `c,"a,b",op` 
 
