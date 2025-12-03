@@ -21,19 +21,24 @@ def main():
     total_repeated = 0
     for start, end in data:
         for l, r, length in ranges(start, end):
-            ll, lr = int(l[:length]), int(l[length:])
-            rl, rr = int(r[:length]), int(r[length:])
-            if ll < lr:
-                ll += 1
-            if rl > rr:
-                rl -= 1
+            lchunks = [int(l[i:i+length]) for i in range(0, len(l), length)]
+            rchunks = [int(r[i:i+length]) for i in range(0, len(r), length)]
+
+            ll = lchunks[0]
+            for lr in lchunks[1:]:
+                if ll < lr:
+                    ll += 1
+            rl = rchunks[0]
+            for rr in rchunks[1:]:
+                if rl > rr:
+                    rl -= 1
 
             if rl < ll:
                 # no valid repetitions in this range
                 continue
 
-            # the repeated numbers are sum(x*(10**length + 1) for x from ll to rl inclusive)
-            # = sum(x from ll to rl) * (10**length + 1)
+            # the repeated numbers are
+            # sum(x from ll to rl) * (sum(10**(length*i)) for i from 0 to (len(l)/length)-1)
             #
             # sum(x from ll to rl) = sum(x from 1 to rl) - sum(x from 1 to ll-1)
             # given sum(x from 1 to n) == n(n+1)/2, this works out as
