@@ -1,18 +1,22 @@
 
 
-def ranges(start, end):
+def ranges(start, end, repeats):
     if len(start) == len(end):
-        if len(start) % 2 == 0:
-            yield start, end, len(start) // 2
+        if len(start) % repeats == 0:
+            yield start, end, len(start) // repeats
     else:  # len(start) < len(end)
-        if len(start) % 2 == 0:
-            yield start, str(10**len(start) - 1), len(start) // 2
+        if len(start) % repeats == 0:
+            yield start, str(10**len(start) - 1), len(start) // repeats
         start = str(10**len(start))
         for i in range(len(start), len(end)):
-            if i % 2 == 1:
-                yield str(10**i), str((10**i+1) - 1), (i + 1) // 2
-        if len(end) % 2 == 0:
-            yield str(10**(len(end)-1)), end, len(end) // 2
+            if (i+1) % repeats == 0:
+                yield str(10**i), str((10**i+1) - 1), (i + 1) // repeats
+        if len(end) % repeats == 0:
+            yield str(10**(len(end)-1)), end, len(end) // repeats
+
+def all_ranges(start, end):
+    for i in range(2, len(end)+1):
+        yield from ranges(start, end, i)
 
 def main():
     with open("input", "r") as f:
@@ -20,7 +24,7 @@ def main():
 
     total_repeated = 0
     for start, end in data:
-        for l, r, length in ranges(start, end):
+        for l, r, length in all_ranges(start, end):
             lchunks = [int(l[i:i+length]) for i in range(0, len(l), length)]
             rchunks = [int(r[i:i+length]) for i in range(0, len(r), length)]
 
@@ -44,8 +48,9 @@ def main():
             # given sum(x from 1 to n) == n(n+1)/2, this works out as
             #
             # = ((rl * (rl+1)) - ((ll-1)*ll)) / 2
-            total_repeated += (10**length + 1) * (((rl * (rl+1)) - ((ll-1)*ll)) // 2)
+            total_repeated += (((rl * (rl+1)) - ((ll-1)*ll)) // 2) * sum(10**(length * i) for i in range(len(l) // length))
 
+            # work out how to deal with the triple-counting of 222222 as 222*2, 22*3 and 2*6
     print(f"{total_repeated=}")
 
 
