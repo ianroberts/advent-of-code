@@ -41,10 +41,20 @@ class Cell(namedtuple("Cell", ["row", "col"])):
         return Cell(self.row * other, self.col * other)
 
     def __neg__(self) -> "Cell":
+        """
+        Pointwise negation
+        """
         return Cell(-self.row, -self.col)
 
     def of(self, grid: Sequence[Sequence[T]]) -> T:
         return grid[self.row][self.col]
+
+    def __rmatmul__(self, other: Sequence[Sequence[T]]) -> T:
+        """
+        Operator overload so we can use the more mnemonic ``grid @ cell``
+        to extract ``grid[cell.row][cell.col]``.
+        """
+        return self.of(other)
 
     def set(self, grid: Sequence[MutableSequence[T]], val: T) -> None:
         grid[self.row][self.col] = val

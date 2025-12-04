@@ -13,9 +13,9 @@ def load_input():
 def accessible_cells(grid: list[list[str]], vr, vc, search_set: Iterable[Cell]) -> list[Cell]:
     accessible = []
     for c in search_set:
-        if c.of(grid) == "@":
+        if grid @ c == "@":
             nbr = sum(
-                1 if nbr.of(grid) == "@" else 0
+                1 if grid @ nbr == "@" else 0
                 for nbr in c.neighbours(valid_rows=vr, valid_cols=vc, include_diagonal=True)
             )
             if nbr < 4:
