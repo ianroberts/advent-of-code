@@ -75,4 +75,4 @@ The trick is to consider the prime factors of $d$.  To be able to split a $d$-di
 \end{align}
 ```
 
-Add the individual sets, subtract the 2-set intersections, add back in the 3-set intersections, etc.  In general we want to consider all possible combinations of the distinct prime factors (i.e. all non-empty subsets $C \subseteq P$), calculate the total repeats when splitting into $\prod P$ chunks, then _add_ this to the running total if $|P|$ is odd, or _subtract_ it from the total if $|P|$ is even.
+Add the individual sets, subtract the 2-set intersections, add back in the 3-set intersections, etc.  In general we want to consider all possible combinations of the distinct prime factors (i.e. all non-empty subsets $C \subseteq P$), calculate the total repeats when splitting into $\prod C$ chunks, then _add_ this to the running total if $|C|$ is odd, or _subtract_ it from the total if $|C|$ is even.
