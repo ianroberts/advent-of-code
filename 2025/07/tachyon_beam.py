@@ -1,10 +1,8 @@
-from collections import defaultdict
-
 def load_input():
     # We don't need to represent the whole grid, all we care about
     # is the column position of the beam source, and the set of
     # column positions for each row of splitters
-    start_col: int = None
+    start_col: int = -1
     splitters: list[set[int]] = []
     with open("input", "r") as f:
         for line in f:
@@ -13,7 +11,7 @@ def load_input():
             elif "^" in line:
                 splitter_cols = set()
                 c = -1
-                while (c := line.find("^", c+1)) >= 0:
+                while (c := line.find("^", c + 1)) >= 0:
                     splitter_cols.add(c)
                 splitters.append(splitter_cols)
 
@@ -30,8 +28,7 @@ def main():
     # column position by the current level - there's far too many routes
     # to actually enumerate them all, but we only care about the *number*
     # of routes, not which routes they actually were.
-    timelines: dict[int, int] = defaultdict(int)
-    timelines[start_col] = 1
+    timelines: dict[int, int] = {start_col: 1}
 
     for row in splitters:
         for splitter in row:
@@ -47,9 +44,9 @@ def main():
                 beams.add(splitter + 1)
 
                 # part 2: count timelines
-                routes_to_here = timelines[splitter]
-                routes_to_left = timelines[splitter - 1]
-                routes_to_right = timelines[splitter + 1]
+                routes_to_here = timelines[splitter]  # definitely exists
+                routes_to_left = timelines.get(splitter - 1, 0)  # assume 0 if not found
+                routes_to_right = timelines.get(splitter + 1, 0)
                 # this splitter will extinguish the beam at its own
                 # position
                 del timelines[splitter]
@@ -65,5 +62,5 @@ def main():
     print(f"Total timelines: {sum(timelines.values())}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
