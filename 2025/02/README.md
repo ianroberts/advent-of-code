@@ -76,3 +76,29 @@ The trick is to consider the prime factors of $d$.  To be able to split a $d$-di
 ```
 
 Add the individual sets, subtract the 2-set intersections, add back in the 3-set intersections, etc.  In general we want to consider all possible combinations of the distinct prime factors (i.e. all non-empty subsets $C \subseteq P$), calculate the total repeats when splitting into $\prod C$ chunks, then _add_ this to the running total if $|C|$ is odd, or _subtract_ it from the total if $|C|$ is even.
+
+## Performance
+
+[Brute-force version](store_values.py)
+
+This approach is more or less linear in the total number of points in all the ranges (on the order of $10^{10}$ for the given test data).
+
+```
+Part 1: total_repeated=30323879646
+Time: 0.2612517918460071
+Part 2: total_repeated=43872163557
+Time: 0.20210270886309445
+```
+
+[Mathematical version](product_ids.py)
+
+Here the calculation for each $k$ split of each range is effectively `O(1)`, and the number of calculations we have to do will be the number of ranges times $2^p-1$ where $p$ is the number of prime factors of the length-in-digits of the range endpoint.  Concretely, in the actual test data the largest range endpoint is 10 digits, so the all the possible lengths have either 1 or 2 prime factors ($6 = 2 \times 3$, $10 = 2 \times 5$, everything else is either prime - $2, 3, 5, 7$ - or a power of a single factor - $4 = 2 \times 2$, $8 = 2 \times 2 \times 2$, and $9 = 3 \times 3$), so it'll be 1 or 3 calculations per range.
+
+```
+Part 1: total_repeated=30323879646
+Time: 7.545808330178261e-05
+Part 2: total_repeated=43872163557
+Time: 0.00018754089251160622
+```
+
+(~1000x faster).
