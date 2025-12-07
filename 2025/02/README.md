@@ -22,17 +22,17 @@ E = 10^c . E_2 + E_1
 - $R_S = S_2+1$, if $S_2 < S_1$, or $R_S = S_2$ otherwise
 - $R_E = E_2-1$, if $E_2 > E_1$, or $R_E = E_2$ otherwise
 
-As a concrete example, if the range endpoints are 456345 - 500478, then the first repeat in that range will be 456456 (since 456 > 345, and the last repeat will be 499499 (since 500 > 478, so 500500 would be out of range).  So the sum of all repeats in the range will be
+As a concrete example, if the range endpoints are 456345 - 500478, then the first repeat in that range will be 456456 (since 456 > 345, and the last repeat will be 499499 (since 500 > 478, so 500500 would be out of range).  If $R_S > R_E$ then there are no possible repeats in this range; otherwise, the sum of all repeats in the range will be
 
-$$\sum_{m=R_S}^{R_E} m . (10^c+1)$$
+$$\sum_{m=R_S}^{R_E} \left(m . (10^c+1)\right)$$
 
 The $10^c+1$ is a "repetition factor" which depends on the number of digits in each chunk - it essentially puts a 1 in each of the halves e.g. 456456 is 456 multiplied by (00)1001.  Now a bit of algebra:
 
 ```math
 \begin{align}
-\sum_{m=R_S}^{R_E} m . (10^c+1) & = & (10^c+1) \sum_{m=R_S}^{R_E} m \\
-                                & = & (10^c+1) \left[\left(\sum_{m=1}^{R_E} m\right) - \left(\sum_{m=1}^{R_S-1} m\right) \right] \\
-                                & = & (10^c+1) \left[\frac{R_E (R_E+1) - (R_S-1) R_S}{2}\right] \\
+\sum_{m=R_S}^{R_E} \left(m . (10^c+1)\right) & = & (10^c+1) \left[\sum_{m=R_S}^{R_E} m \right] \\
+                                             & = & (10^c+1) \left[\left(\sum_{m=1}^{R_E} m\right) - \left(\sum_{m=1}^{R_S-1} m\right) \right] \\
+                                             & = & (10^c+1) \left[\frac{R_E (R_E+1) - (R_S-1) R_S}{2}\right] \\
 \end{align}
 ```
 
@@ -44,8 +44,8 @@ The same logic generalises for part 2 to _any_ even split of any $d$-digit endpo
 
 ```math
 \begin{align}
-S & = & \sum_{i=1}^{k} 10^{i-1} . S_i
-E & = & \sum_{i=1}^{k} 10^{i-1} . E_i
+S & = & \sum_{i=1}^{k} \left( 10^{i-1} . S_i \right) \\
+E & = & \sum_{i=1}^{k} \left( 10^{i-1} . E_i \right)
 \end{align}
 ```
 
@@ -65,14 +65,14 @@ We now have a closed-form expression for all the $k$-chunk splits of every range
 
 ### Prime factors, and the inclusion-exclusion principle
 
-The trick is to consider the prime factors of $d$.  To be able to split a $d$-digit number evenly into $k$ chunks, $k$ must be some product of one or more of the prime factors of $d$.  Any $k$ with repeated factors can be ignored, since any repeating pattern of digits arising from a split into $k \times j$ chunks must necessarily also be a repeating pattern that could arise from $k$ chunks (e.g. for twelve digits, 121212121212 is a repeating pattern in 6 chunks of 2 digits each, but it's also a repeating pattern in 3 chunks of 4 and in 2 chunks of 6).  So if $d$ has a set of _distinct_ prime factors $P = \{p_1, p_2, \ldots p_j}$ then what we need is the _union_ of the set of repeats arising from $p_1$ chunks, and the set of repeats arising from $p_2$ chunks, etc. up to $p_j$.  The way to get all of these without repeats is the inclusion-exclusion principle:
+The trick is to consider the prime factors of $d$.  To be able to split a $d$-digit number evenly into $k$ chunks, $k$ must be some product of one or more of the prime factors of $d$.  Any $k$ with repeated factors can be ignored, since any repeating pattern of digits arising from a split into $k \times j$ chunks must necessarily also be a repeating pattern that could arise from $k$ chunks (e.g. for twelve digits, 121212121212 is a repeating pattern in 6 chunks of 2 digits each, but it's also a repeating pattern in 3 chunks of 4 and in 2 chunks of 6).  So if $d$ has a set of _distinct_ prime factors $P = \lbrace p_1, p_2, \ldots p_j \rbrace$ then what we need is the _union_ of the set of repeats arising from $p_1$ chunks, and the set of repeats arising from $p_2$ chunks, etc. up to $p_j$.  The way to get all of these without repeats is the inclusion-exclusion principle:
 
 ```math
-\begin{align}
-       |A \cup B| & = & |A| + |B| - |A \cap B| \\
-|A \cup B \cup C| & = & |A| + |B| + |C| - |A \cap B| - |A \cap C| - |B \cap C| + |A \cap B \cap C|\\
-                  & \vdots & \\
-\end{align}
+\begin{aligned}
+\left| A \cup B \right| &= \left| A \right| + \left| B \right| - \left| A \cap B \right| \\
+\left| A \cup B \cup C \right| &= \left| A \right| + \left| B \right| + \left| C \right| - \left| A \cap B \right| - \left| A \cap C \right| - \left| B \cap C \right| + \left| A \cap B \cap C \right| \\
+                 & \vdots
+\end{aligned}
 ```
 
 Add the individual sets, subtract the 2-set intersections, add back in the 3-set intersections, etc.  In general we want to consider all possible combinations of the distinct prime factors (i.e. all non-empty subsets $C \subseteq P$), calculate the total repeats when splitting into $\prod C$ chunks, then _add_ this to the running total if $|C|$ is odd, or _subtract_ it from the total if $|C|$ is even.
