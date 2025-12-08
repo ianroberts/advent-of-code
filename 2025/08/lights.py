@@ -20,9 +20,9 @@ def main():
     squared_distances: list[tuple[int, int, int]] = []
     for i in range(len(boxes) - 1):
         xi, yi, zi = boxes[i]
-        for j in range(i+1, len(boxes)):
+        for j in range(i + 1, len(boxes)):
             xj, yj, zj = boxes[j]
-            d_ij = (xj-xi)**2 + (yj-yi)**2 + (zj-zi)**2
+            d_ij = (xj - xi) ** 2 + (yj - yi) ** 2 + (zj - zi) ** 2
             squared_distances.append((i, j, d_ij))
 
     squared_distances.sort(key=operator.itemgetter(2))
