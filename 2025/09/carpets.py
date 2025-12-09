@@ -90,20 +90,30 @@ def part2(red):
     for i in range(len(red) - 1):
         for j in range(i + 1, len(red)):
             ci = red[i]
-            sci = scaled_corners[i]
             cj = red[j]
-            scj = scaled_corners[j]
-
-            topleft = Cell(min(sci.row, scj.row), min(sci.col, scj.col))
-            bottomright = Cell(max(sci.row, scj.row), max(sci.col, scj.col))
-            if any((not is_inside[r][c]) for r in range(topleft.row, bottomright.row+1) for c in range(topleft.col, bottomright.col+1)):
-                # This rect is not inside the bounds
-                continue
 
             # each side length of the rectangle is the difference in that
             # coordinate, plus one to include the edge row/col
             area = (abs(ci.row - cj.row) + 1) * (abs(ci.col - cj.col) + 1)
-            if area > biggest_rect:
+            if area <= biggest_rect:
+                # this can't be the biggest rectangle, skip to next candidate
+                continue
+
+            sci = scaled_corners[i]
+            scj = scaled_corners[j]
+
+            topleft = Cell(min(sci.row, scj.row), min(sci.col, scj.col))
+            bottomright = Cell(max(sci.row, scj.row), max(sci.col, scj.col))
+            if all(
+                is_inside[r][c]
+                for r in range(topleft.row, bottomright.row + 1)
+                for c in (topleft.col, bottomright.col)
+            ) and all(
+                is_inside[r][c]
+                for c in range(topleft.col, bottomright.col + 1)
+                for r in (topleft.row, bottomright.row)
+            ):
+                # This rect is inside the bounds, and we already know it's the biggest
                 biggest_rect = area
 
     print(f"{biggest_rect=}")
